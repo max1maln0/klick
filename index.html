@@ -40,11 +40,17 @@
         
         .header {
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
+        }
+        
+        .score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
         
         .score-display {
@@ -53,14 +59,28 @@
             color: var(--jager-orange);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             background: rgba(0, 0, 0, 0.2);
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 20px;
             display: flex;
             align-items: center;
         }
         
+        .per-second {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+        
+        .level-display {
+            font-size: 16px;
+            background: rgba(0, 122, 51, 0.3);
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
         .logo {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: white;
         }
@@ -82,10 +102,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
         
-        /* Изменено с background-image на img */
         .bottle {
             width: 180px;
             height: 180px;
@@ -94,6 +113,7 @@
             transition: transform 0.1s;
             user-select: none;
             -webkit-user-drag: none;
+            z-index: 2;
         }
         
         .bottle:active {
@@ -111,8 +131,29 @@
             transition: opacity 0.3s;
         }
         
-        .bottle-container:active . glow {
+        .bottle-container:active .glow {
             opacity: 1;
+        }
+        
+        .splash {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: url('ВАШ_URL_АНИМАЦИИ_БРЫЗГ') no-repeat center center;
+            background-size: contain;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        
+        .splash.active {
+            opacity: 1;
+            animation: splash-animation 0.5s forwards;
+        }
+        
+        @keyframes splash-animation {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -120,28 +161,61 @@
     <div class="background"></div>
     <div class="header">
         <div class="logo">Jägermeister Clicker</div>
-        <div class="score-display" id="score">0</div>
+        <div class="score-container">
+            <div class="score-display" id="score">0</div>
+            <div class="per-second" id="perSecond">0/sec</div>
+            <div class="level-display" id="level">Level: 1</div>
+        </div>
     </div>
     <div class="main-area">
         <div class="bottle-container">
             <img src="ВАШ_URL_ИЗОБРАЖЕНИЯ" id="bottle" class="bottle" alt="Jägermeister Bottle">
             <div class="glow"></div>
+            <div class="splash" id="splash"></div>
         </div>
     </div>
     <script>
         let score = 0;
+        let level = 1;
+        let perSecond = 0;
         const scoreDisplay = document.getElementById('score');
+        const perSecondDisplay = document.getElementById('perSecond');
+        const levelDisplay = document.getElementById('level');
         const bottle = document.getElementById('bottle');
+        const splash = document.getElementById('splash');
 
         bottle.addEventListener('click', () => {
             score++;
             scoreDisplay.textContent = score;
+            showSplash();
+            updatePerSecond();
+            checkLevelUp();
         });
 
-        // Убедитесь, что изображение загружается корректно
+        function showSplash() {
+            splash.classList.add('active');
+            setTimeout(() => {
+                splash.classList.remove('active');
+            }, 500);
+        }
+
+        function updatePerSecond() {
+            perSecond = Math.floor(score / (Math.floor(Date.now() / 1000) - startTime));
+            perSecondDisplay.textContent = `${perSecond}/sec`;
+        }
+
+        function checkLevelUp() {
+            if (score >= level * 10) {
+                level++;
+                levelDisplay.textContent = `Level: ${level}`;
+            }
+        }
+
+        let startTime = Math.floor(Date.now() / 1000);
+        
         bottle.onerror = function() {
-            this.src = 'https://avatars.mds.yandex.net/i?id=16fae582dd270dc8b3ffb6c93efc8cf0_l-4937827-images-thumbs&n=13'; // Замените на URL изображения по умолчанию
+            this.src = 'https://avatars.mds.yandex.net/i?id=16fae582dd270dc8b3ffb6c93efc8cf0_l-4937827-images-thumbs&n=13';
         };
     </script>
 </body>
-</html> 
+</html>
