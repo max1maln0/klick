@@ -117,7 +117,7 @@
         }
         
         .bottle:active {
-            transform: scale(0 .92);
+            transform: scale(0.92);
         }
         
         .glow {
@@ -201,8 +201,9 @@
         </div>
         <button onclick="showBoosters()">Усилители</button>
         <div class="boosters-menu" id="boostersMenu">
-            <button onclick="buyMultiplier(2)">Клик x2 за 50 очков</button>
-            <button onclick="buyMultiplier(3)">Клик x3 за 100 очков</button>
+            <button id="multiplier2" onclick="buyMultiplier(2)">Клик x2 за 50 очков</button>
+            <button id="multiplier3" style="display:none;" onclick="buyMultiplier(3)">Клик x3 за 100 очков</button>
+            <button onclick="buyAutoclicker()">Автокликер за 100 очков</button>
             <button onclick="hideBoosters()">Закрыть</button>
         </div>
     </div>
@@ -210,6 +211,7 @@
         let score = 0;
         let multiplier = 1;
         let perSecond = 0;
+        let autoclickerActive = false;
 
         function handleClick() {
             score += multiplier;
@@ -222,8 +224,30 @@
                 score -= cost;
                 multiplier = multiplierValue;
                 updateDisplay();
+                if (multiplierValue === 2) {
+                    document.getElementById('multiplier2').style.display = 'none';
+                    document.getElementById('multiplier3').style.display = 'block';
+                } else {
+                    document.getElementById('multiplier3').style.display = 'none';
+                }
             } else {
                 alert("Недостаточно очков для покупки!");
+            }
+        }
+
+        function buyAutoclicker() {
+            if (score >= 100 && !autoclickerActive) {
+                score -= 100;
+                autoclickerActive = true;
+                updateDisplay();
+                setInterval(() => {
+                    if (autoclickerActive) {
+                        score += 1;
+                        updateDisplay();
+                    }
+                }, 2000);
+            } else {
+                alert("Недостаточно очков для покупки автокликера или он уже активен!");
             }
         }
 
@@ -237,7 +261,7 @@
 
         function updateDisplay() {
             document.getElementById('score').innerText = score;
-            document.getElementById('perSecond').innerText = perSecond + " очков в секунду";
+            document.getElementById('perSecond ').innerText = perSecond + " очков в секунду";
             document.getElementById('level').innerText = "Уровень: " + multiplier;
         }
 
@@ -245,5 +269,7 @@
             score += perSecond;
             updateDisplay();
         }, 1000);
-    </script </body>
+    </script>
+</body>
 </html> 
+
