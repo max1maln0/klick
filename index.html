@@ -85,15 +85,15 @@
             margin-bottom: 40px;
         }
         
+        /* Изменено с background-image на img */
         .bottle {
             width: 180px;
             height: 180px;
-            background-image: url('https://avatars.mds.yandex.net/i?id=16fae582dd270dc8b3ffb6c93efc8cf0_l-4937827-images-thumbs&n=13'); /* Относительный путь */
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            object-fit: contain;
             cursor: pointer;
             transition: transform 0.1s;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         
         .bottle:active {
@@ -111,45 +111,8 @@
             transition: opacity 0.3s;
         }
         
-        .bottle-container:active .glow {
+        .bottle-container:active . glow {
             opacity: 1;
-        }
-        
-        .jager-particle {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: var(--jager-orange);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particle-animation 1s forwards;
-        }
-
-        @keyframes particle-animation {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) scale(0);
-                opacity: 0;
-            }
-        }
-
-        .multiplier-button {
-            padding: 10px 20px;
-            font-size: 20px;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--jager-green);
-            color: white;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-
-        .multiplier-button:hover {
-            background-color: #005f26;
         }
     </style>
 </head>
@@ -157,67 +120,28 @@
     <div class="background"></div>
     <div class="header">
         <div class="logo">Jägermeister Clicker</div>
-        <div class="score-display" id="score">Очки: 0</div>
+        <div class="score-display" id="score">0</div>
     </div>
     <div class="main-area">
         <div class="bottle-container">
-            <div class="bottle" id="bottle"></div>
+            <img src="ВАШ_URL_ИЗОБРАЖЕНИЯ" id="bottle" class="bottle" alt="Jägermeister Bottle">
             <div class="glow"></div>
         </div>
-        <button class="multiplier-button" id="multiplier">Множитель (10 очков)</button>
     </div>
-
     <script>
         let score = 0;
-        let clickValue = 1;
-        const scoreElement = document.getElementById('score');
+        const scoreDisplay = document.getElementById('score');
         const bottle = document.getElementById('bottle');
-        const multiplierButton = document.getElementById('multiplier');
-
-        const tg = window.Telegram.WebApp;
-        tg.expand();
 
         bottle.addEventListener('click', () => {
-            score += clickValue;
-            scoreElement.textContent = `Очки: ${score}`;
-            createParticles(event.clientX, event.clientY);
+            score++;
+            scoreDisplay.textContent = score;
         });
 
-        multiplierButton.addEventListener('click', () => {
-            if (score >= 10) {
-                score -= 10;
-                clickValue *= 2;
-                scoreElement.textContent = `Очки: ${score}`;
-                multiplierButton.textContent = `Множитель (${10 * clickValue} очков)`;
-            } else {
-                tg.showAlert('Недостаточно очков!');
-            }
-        });
-
-        function createParticles(x, y) {
-            const particle = document.createElement('div');
-            particle.className = 'jager-particle';
-            particle.style.left = `${x - 5}px`;
-            particle.style.top = `${y - 5}px`;
-            document.body.appendChild(particle);
-            setTimeout(() => {
-                particle.remove();
-            }, 1000);
-        }
-
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('jagerClickerScore', score);
-            localStorage.setItem('jagerClickerMultiplier', clickValue);
-        });
-
-        window.addEventListener('load', () => {
-            const savedScore = localStorage.getItem('jagerClickerScore');
-            const savedMultiplier = localStorage.getItem('jagerClickerMultiplier');
-            if (savedScore) score = parseInt(savedScore);
-            if (savedMultiplier) clickValue = parseInt(savedMultiplier);
-            scoreElement.textContent = `Очки: ${score}`;
-            multiplierButton.textContent = `Множитель (${10 * clickValue} очков)`;
-        });
+        // Убедитесь, что изображение загружается корректно
+        bottle.onerror = function() {
+            this.src = 'https://avatars.mds.yandex.net/i?id=16fae582dd270dc8b3ffb6c93efc8cf0_l-4937827-images-thumbs&n=13'; // Замените на URL изображения по умолчанию
+        };
     </script>
 </body>
-</html>
+</html> 
