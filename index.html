@@ -121,7 +121,7 @@
         }
         
         .glow {
-            position: absolute;
+            position:absolute;
             width: 220px;
             height: 220px;
             border-radius: 50%;
@@ -151,9 +151,49 @@
             animation: splash-animation 0.5s forwards;
         }
         
-        @keyframes splash-animation {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
+        @key frames splash-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); }
+        }
+
+        .boosters-menu {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 20;
+        }
+
+        .boosters-menu button {
+            background: var(--jager-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .boosters-menu button:hover {
+            background: var(--jager-orange);
+        }
+
+        .back-button {
+            background: var(--jager-dark);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background: var(--jager-green);
         }
     </style>
 </head>
@@ -163,59 +203,76 @@
         <div class="logo">Jägermeister Clicker</div>
         <div class="score-container">
             <div class="score-display" id="score">0</div>
-            <div class="per-second" id="perSecond">0/sec</div>
-            <div class="level-display" id="level">Level: 1</div>
+            <div class="per-second" id="perSecond">0 очков в секунду</div>
+            <div class="level-display" id="level">Уровень: 1</div>
         </div>
     </div>
     <div class="main-area">
-        <div class="bottle-container">
-            <img src="ВАШ_URL_ИЗОБРАЖЕНИЯ" id="bottle" class="bottle" alt="Jägermeister Bottle">
+        <div class="bottle-container" id="bottleContainer">
+            <img src="ВАШ_URL_БУТЫЛКИ" class="bottle" id="bottle" onclick="addScore()">
             <div class="glow"></div>
             <div class="splash" id="splash"></div>
+        </div>
+        <button onclick="showBoosters()">Усилители</button>
+        <div class="boosters-menu" id="boostersMenu">
+            <h3>Купить Усилители</h3>
+            <button onclick="buyMultiplier(2, 50)">Клик x2 (50 очков)</button>
+            <button onclick="buyMultiplier(3, 100)">Клик x3 (100 очков)</button>
+            <button class="back-button" onclick="hideBoosters()">Назад</button>
         </div>
     </div>
     <script>
         let score = 0;
         let level = 1;
         let perSecond = 0;
-        const scoreDisplay = document.getElementById('score');
-        const perSecondDisplay = document.getElementById('perSecond');
-        const levelDisplay = document.getElementById('level');
-        const bottle = document.getElementById('bottle');
-        const splash = document.getElementById('splash');
+        let clickMultiplier = 1;
 
-        bottle.addEventListener('click', () => {
-            score++;
-            scoreDisplay.textContent = score;
+        function addScore() {
+            score += clickMultiplier;
+            updateDisplay();
             showSplash();
-            updatePerSecond();
             checkLevelUp();
-        });
+        }
 
         function showSplash() {
+            const splash = document.getElementById('splash');
             splash.classList.add('active');
             setTimeout(() => {
                 splash.classList.remove('active');
             }, 500);
         }
 
-        function updatePerSecond() {
-            perSecond = Math.floor(score / (Math.floor(Date.now() / 1000) - startTime));
-            perSecondDisplay.textContent = `${perSecond}/sec`;
+        function updateDisplay() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('perSecond').innerText = perSecond + ' очков в секунду';
+            document.getElementById('level').innerText = 'Уровень: ' + level;
         }
 
         function checkLevelUp() {
             if (score >= level * 10) {
                 level++;
-                levelDisplay.textContent = `Level: ${level}`;
+                updateDisplay();
             }
         }
 
-        let startTime = Math.floor(Date.now() / 1000);
-        
-        bottle.onerror = function() {
-            this.src = 'https://avatars.mds.yandex.net/i?id=16fae582dd270dc8b3ffb6c93efc8cf0_l-4937827-images-thumbs&n=13';
-        };
+        function showBoosters() {
+            document.getElementById('boostersMenu').style.display = 'block';
+        }
+
+        function hideBoosters() {
+            document.getElementById('boostersMenu').style.display = 'none';
+        }
+
+        function buyMultiplier(multiplier, cost) {
+            if (score >= cost) {
+                score -= cost;
+                clickMultiplier = multiplier;
+                updateDisplay();
+                hideBoosters();
+            } else {
+                alert('Недостаточно очков для покупки!');
+            }
+        }
     </script>
 </body>
 </html>
