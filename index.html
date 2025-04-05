@@ -149,51 +149,37 @@
         .splash.active {
             opacity: 1;
             animation: splash-animation 0.5s forwards;
+ }
+        
+        @keyframes splash-animation {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); opacity: 0; }
         }
         
-        @key frames splash-animation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.5); }
-            100% { transform: scale(0); }
-        }
-
         .boosters-menu {
             display: none;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            bottom: 20px;
             background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
             border-radius: 10px;
-            z-index: 20;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
         }
-
+        
         .boosters-menu button {
             background: var(--jager-green);
             color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
             border-radius: 5px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: background 0.3s;
         }
-
+        
         .boosters-menu button:hover {
             background: var(--jager-orange);
-        }
-
-        .back-button {
-            background: var(--jager-dark);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .back-button:hover {
-            background: var(--jager-green);
         }
     </style>
 </head>
@@ -208,50 +194,36 @@
         </div>
     </div>
     <div class="main-area">
-        <div class="bottle-container" id="bottleContainer">
-            <img src="ВАШ_URL_БУТЫЛКИ" class="bottle" id="bottle" onclick="addScore()">
+        <div class="bottle-container">
+            <img src="ВАШ_URL_БУТЫЛКИ" class="bottle" id="bottle" onclick="handleClick()">
             <div class="glow"></div>
             <div class="splash" id="splash"></div>
         </div>
         <button onclick="showBoosters()">Усилители</button>
         <div class="boosters-menu" id="boostersMenu">
-            <h3>Купить Усилители</h3>
-            <button onclick="buyMultiplier(2, 50)">Клик x2 (50 очков)</button>
-            <button onclick="buyMultiplier(3, 100)">Клик x3 (100 очков)</button>
-            <button class="back-button" onclick="hideBoosters()">Назад</button>
+            <button onclick="buyMultiplier(2)">Клик x2 за 50 очков</button>
+            <button onclick="buyMultiplier(3)">Клик x3 за 100 очков</button>
+            <button onclick="hideBoosters()">Закрыть</button>
         </div>
     </div>
     <script>
         let score = 0;
-        let level = 1;
+        let multiplier = 1;
         let perSecond = 0;
-        let clickMultiplier = 1;
 
-        function addScore() {
-            score += clickMultiplier;
+        function handleClick() {
+            score += multiplier;
             updateDisplay();
-            showSplash();
-            checkLevelUp();
         }
 
-        function showSplash() {
-            const splash = document.getElementById('splash');
-            splash.classList.add('active');
-            setTimeout(() => {
-                splash.classList.remove('active');
-            }, 500);
-        }
-
-        function updateDisplay() {
-            document.getElementById('score').innerText = score;
-            document.getElementById('perSecond').innerText = perSecond + ' очков в секунду';
-            document.getElementById('level').innerText = 'Уровень: ' + level;
-        }
-
-        function checkLevelUp() {
-            if (score >= level * 10) {
-                level++;
+        function buyMultiplier(multiplierValue) {
+            const cost = multiplierValue === 2 ? 50 : 100;
+            if (score >= cost) {
+                score -= cost;
+                multiplier = multiplierValue;
                 updateDisplay();
+            } else {
+                alert("Недостаточно очков для покупки!");
             }
         }
 
@@ -263,16 +235,16 @@
             document.getElementById('boostersMenu').style.display = 'none';
         }
 
-        function buyMultiplier(multiplier, cost) {
-            if (score >= cost) {
-                score -= cost;
-                clickMultiplier = multiplier;
-                updateDisplay();
-                hideBoosters();
-            } else {
-                alert('Недостаточно очков для покупки!');
-            }
+        function updateDisplay() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('perSecond').innerText = perSecond + " очков в секунду";
+            document.getElementById('level').innerText = "Уровень: " + multiplier;
         }
+
+        setInterval(() => {
+            score += perSecond;
+            updateDisplay();
+        }, 1000);
     </script>
 </body>
 </html>
